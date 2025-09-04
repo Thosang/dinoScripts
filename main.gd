@@ -99,7 +99,13 @@ func generate_obs(): # ฟังก์ชันสร้างอุปสรร
 			#obs.position = Vector2i(obs_x, obs_y) # ตั้งต าแหน่ง (x, y) ให้กับอุปสรรค
 			#add_child(obs) # เพิ่มอุปสรรคเข้าไปใน scene tree เพื่อแสดงในเกมobstacles.append(obs) # เก็บ reference ของอุปสรรคไว้ในลิสต์ obstacles
 			#obstacles.append(obs)
-			
+			if difficulty == MAX_DIFFICULTY:
+				if (randi() % 2) == 0:
+					#generate bird obstacles
+					obs = bird_scene.instantiate()
+					obs_x  = screen_size.x + score + 100
+					obs_y  = bird_heighs[randi() % bird_heighs.size()]
+					add_obs(obs, obs_x, obs_y)
 			
 		
 		
