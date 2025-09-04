@@ -17,7 +17,8 @@ var obstacles : Array
 var bird_heighs := [200,390]
 var last_obs
 var ground_height : int
-
+var difficulty
+const MAX_DIFFICULTY : int = 2
 
 
 func _ready() -> void:
@@ -27,6 +28,7 @@ func _ready() -> void:
 
 func new_game():
 	score = 0
+	difficulty=0
 	$Dino.position = DINO_START_POS
 	# ตั้งตำแหน่งของ Dino กลับไปที่ค่าเริ่มต้น (x=150, y=485)
 
@@ -45,6 +47,7 @@ func _process(delta: float) -> void:
 			$Ground.position.x += screen_size.x
 	
 	if running_start:
+		adjust_difficulty()
 		generate_obs()
 		speed = START_SPEED +(score/SPEED_MODIFIER) 
 		if speed>=MAX_SPEED :
@@ -75,23 +78,29 @@ func generate_obs(): # ฟังก์ชันสร้างอุปสรร
 	# สุ่มเลือกชนิดอุปสรรคจาก obstacle_types
 		var obs_type = obstacle_types[randi() % obstacle_types.size()]
 		var obs # ประกาศตัวแปร obs ไว้เก็บอุปสรรค
-		obs = obs_type.instantiate() # สร้าง instance (ส าเนา) ของ scene อุปสรรคที่เลือกมา
-		# ดึงความสูงของสไปรท์ (texture height) ของอุปสรรค
-		var	obs_height = obs.get_node("Sprite2D").texture.get_height()
-		# ดึงค่า scale (การขยาย) ของสไปรท์
-		var obs_scale = obs.get_node("Sprite2D").scale
-		# ก าหนดต าแหน่งแกน X ของอุปสรรค# เริ่มต้นจากขอบขวาของจอ (screen_size.x)
-		# บวกค่า score เพื่อให้มันเลื่อนไกลขึ้นตามคะแนน (หรือระยะที่เล่นไปแล้ว)
-		# +100 ไว้เป็นระยะ buffer กันไม่ให้มันโผล่มาชิดเกินไป
-		var obs_x : int = screen_size.x + score + 100
-		var obs_y : int = screen_size.y - ground_height - (obs_height * obs_scale.y / 2) + 5
-		
-		add_obs(obs,obs_x,obs_y)
-		#obs.position = Vector2i(obs_x, obs_y) # ตั้งต าแหน่ง (x, y) ให้กับอุปสรรค
-		#add_child(obs) # เพิ่มอุปสรรคเข้าไปใน scene tree เพื่อแสดงในเกมobstacles.append(obs) # เก็บ reference ของอุปสรรคไว้ในลิสต์ obstacles
-		#obstacles.append(obs)
-		
-		last_obs = obs
+		var max_obs = difficulty + 1
+		print("max obs = ",max_obs)
+		var obs_round = range(randi() % max_obs + 1)
+		print("obs_round = ", obs_round)
+		for i in obs_round:
+			
+			obs = obs_type.instantiate() # สร้าง instance (ส าเนา) ของ scene อุปสรรคที่เลือกมา
+			# ดึงความสูงของสไปรท์ (texture height) ของอุปสรรค
+			var	obs_height = obs.get_node("Sprite2D").texture.get_height()
+			# ดึงค่า scale (การขยาย) ของสไปรท์
+			var obs_scale = obs.get_node("Sprite2D").scale
+			# ก าหนดต าแหน่งแกน X ของอุปสรรค# เริ่มต้นจากขอบขวาของจอ (screen_size.x)
+			# บวกค่า score เพื่อให้มันเลื่อนไกลขึ้นตามคะแนน (หรือระยะที่เล่นไปแล้ว)
+			# +100 ไว้เป็นระยะ buffer กันไม่ให้มันโผล่มาชิดเกินไป
+			var obs_x : int = screen_size.x + score + 100 + (i * 100)
+			var obs_y : int = screen_size.y - ground_height - (obs_height * obs_scale.y / 2) + 5
+			last_obs = obs
+			add_obs(obs,obs_x,obs_y)
+			#obs.position = Vector2i(obs_x, obs_y) # ตั้งต าแหน่ง (x, y) ให้กับอุปสรรค
+			#add_child(obs) # เพิ่มอุปสรรคเข้าไปใน scene tree เพื่อแสดงในเกมobstacles.append(obs) # เก็บ reference ของอุปสรรคไว้ในลิสต์ obstacles
+			#obstacles.append(obs)
+			
+			
 		
 		
 func add_obs(obs, x, y):
@@ -102,4 +111,10 @@ func add_obs(obs, x, y):
 
 func hit_obs(body):
 	if body.name == "Dino":
-		print("hit")
+		pass
+		#print("hit")
+
+func adjust_difficulty():
+	difficulty = score / SPEED_MODIFIER
+	if difficulty > MAX_DIFFICULTY:
+		difficulty = MAX_DIFFICULTY
