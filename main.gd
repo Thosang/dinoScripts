@@ -24,6 +24,7 @@ const MAX_DIFFICULTY : int = 2
 func _ready() -> void:
 	screen_size = get_window().size
 	ground_height = $Ground.get_node("Sprite2D").texture.get_height()
+	$game_over.get_node("Button").pressed.connect(new_game)
 	new_game()
 
 func new_game():
@@ -40,7 +41,8 @@ func new_game():
 
 	$Ground.position = Vector2i(0,0)
 	# ตั้งตำแหน่งพื้น (Ground) ให้อยู่ที่ (0,0) (ไม่เคลื่อนที่ในตอนเริ่ม)
-
+	$HUD/StartLabel.show()
+	$game_over/Button.hide()
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	if $Camera2D.position.x - $Ground.position.x> screen_size.x * 1.5 :
@@ -129,5 +131,7 @@ func adjust_difficulty():
 		difficulty = MAX_DIFFICULTY
 
 func game_over():
+	$game_over/Button.show()
 	get_tree().paused = true
 	running_start=false
+	
