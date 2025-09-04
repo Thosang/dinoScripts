@@ -8,6 +8,18 @@ const MAX_SPEED : int = 25 # ค่าความเร็วสูงสุด
 var screen_size : Vector2i
 var score : int 
 var running_start : bool
+var stump_scene = preload("res://Scenes/stump.tscn")
+var rock_scene = preload("res://Scenes/rock.tscn")
+var barrel_scene = preload("res://Scenes/barrel.tscn")
+var bird_scene = preload("res://Scenes/bird.tscn")
+var obstacle_types := [stump_scene, rock_scene, barrel_scene]
+var obstacles : Array
+var bird_heighs := [200,390]
+var last_obs
+
+
+
+
 
 func _ready() -> void:
 	screen_size = get_window().size
