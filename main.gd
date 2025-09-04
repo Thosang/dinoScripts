@@ -7,6 +7,8 @@ const SPEED_MODIFIER : int = 5000
 const MAX_SPEED : int = 25 # ค่าความเร็วสูงสุดที่ Dino สามารถวิ่งได้
 var screen_size : Vector2i
 var score : int 
+var high_score : int
+const SCORE_MODIFIER : int = 10
 var running_start : bool
 var stump_scene = preload("res://Scenes/stump.tscn")
 var rock_scene = preload("res://Scenes/rock.tscn")
@@ -83,7 +85,7 @@ func _process(delta: float) -> void:
 			$Dino/JumpSound.play()# เล่นเสียงกระโดดจาก Node ที่ชื่อ JumpSound
 			$Dino/AnimatedSprite2D.play("jump")
 func show_score() :
-	$HUD/ScoreLabel.text="SCORE : " + str(score)
+	$HUD/ScoreLabel.text = "SCORE : " + str(score / SCORE_MODIFIER)
 
 func generate_obs(): # ฟังก์ชันสร้างอุปสรรคใหม่
 	if obstacles.is_empty() or last_obs.position.x < score + randi_range(300, 500) : # เช็คว่าตอนนี้ยังไม่มีอุปสรรคอยู่ (ลิสต์ว่างอยู่)
@@ -141,6 +143,7 @@ func adjust_difficulty():
 		difficulty = MAX_DIFFICULTY
 
 func game_over():
+	check_high_score()
 	$game_over/Button.show()
 	get_tree().paused = true
 	running_start=false
@@ -148,3 +151,7 @@ func game_over():
 func remove_obs(obs):
 	obs.queue_free()
 	obstacles.erase(obs)
+func check_high_score():
+	if score > high_score:
+		high_score = score
+		$HUD/HighScoreLabel.text= "HIGH SCORE: " + str(high_score / SCORE_MODIFIER)
