@@ -28,6 +28,12 @@ func _ready() -> void:
 	new_game()
 
 func new_game():
+	running_start = false
+	get_tree().paused = false
+	#delete all obstacles
+	for obs in obstacles:
+		obs.queue_free()
+	obstacles.clear()
 	score = 0
 	difficulty=0
 	$Dino.position = DINO_START_POS
@@ -65,7 +71,11 @@ func _process(delta: float) -> void:
 
 		$Camera2D.position.x += speed
 		# ขยับกล้องตาม Dino ไปทางแกน X เพื่อให้ Dino อยู่กลางจอ
-	else:
+		#remove obstacles that have gone off screen
+		for obs in obstacles:
+			if obs.position.x < ($Camera2D.position.x - screen_size.x):
+				remove_obs(obs)
+	else:	
 		if Input.is_action_just_pressed("jump"):
 			running_start=true
 			$HUD/StartLabel.hide()
@@ -135,3 +145,6 @@ func game_over():
 	get_tree().paused = true
 	running_start=false
 	
+func remove_obs(obs):
+	obs.queue_free()
+	obstacles.erase(obs)
