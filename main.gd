@@ -45,6 +45,7 @@ func _process(delta: float) -> void:
 			$Ground.position.x += screen_size.x
 	
 	if running_start:
+		generate_obs()
 		speed = START_SPEED +(score/SPEED_MODIFIER)
 		if speed>=MAX_SPEED :
 			speed = MAX_SPEED
@@ -70,7 +71,7 @@ func show_score() :
 	$HUD/ScoreLabel.text="SCORE : " + str(score)
 
 func generate_obs(): # ฟังก์ชันสร้างอุปสรรคใหม่
-	if obstacles.is_empty(): # เช็คว่าตอนนี้ยังไม่มีอุปสรรคอยู่ (ลิสต์ว่างอยู่)
+	if obstacles.is_empty() or last_obs.position.x < score + randi_range(300, 500) : # เช็คว่าตอนนี้ยังไม่มีอุปสรรคอยู่ (ลิสต์ว่างอยู่)
 	# สุ่มเลือกชนิดอุปสรรคจาก obstacle_types
 		var obs_type = obstacle_types[randi() % obstacle_types.size()]
 		var obs # ประกาศตัวแปร obs ไว้เก็บอุปสรรค
@@ -83,11 +84,13 @@ func generate_obs(): # ฟังก์ชันสร้างอุปสรร
 		# บวกค่า score เพื่อให้มันเลื่อนไกลขึ้นตามคะแนน (หรือระยะที่เล่นไปแล้ว)
 		# +100 ไว้เป็นระยะ buffer กันไม่ให้มันโผล่มาชิดเกินไป
 		var obs_x : int = screen_size.x + score + 100
-		# ก าหนดต าแหน่งแกน Y ของอุปสรรค
-		# เริ่มจากขอบล่างของจอ (screen_size.y)
-		# ลบความสูงพื้น (ground_height)
-		# ลบครึ่งหนึ่งของความสูงจริงของอุปสรรค (ค านวณจาก obs_height * scale)
-		# +5 ไว้เพื่อปรับเล็กน้อยไม่ให้จมลงไปในพื้น
 		var obs_y : int = screen_size.y - ground_height - (obs_height * obs_scale.y / 2) + 5
-		obs.position = Vector2i(obs_x, obs_y) # ตั้งต าแหน่ง (x, y) ให้กับอุปสรรคlast_obs = obs
+		obs.position = Vector2i(obs_x, obs_y) # ตั้งต าแหน่ง (x, y) ให้กับอุปสรรค
+		last_obs = obs
 		add_child(obs) # เพิ่มอุปสรรคเข้าไปใน scene tree เพื่อแสดงในเกมobstacles.append(obs) # เก็บ reference ของอุปสรรคไว้ในลิสต์ obstacles
+		obstacles.append(obs)
+func add_obs(obs, x, y):
+	obs.position = Vector2i(x, y)
+	#obs.body_entered.connect(hit_obs)
+	add_child(obs)
+	obstacles.append(obs)
