@@ -79,9 +79,9 @@ func generate_obs(): # ฟังก์ชันสร้างอุปสรร
 		var obs_type = obstacle_types[randi() % obstacle_types.size()]
 		var obs # ประกาศตัวแปร obs ไว้เก็บอุปสรรค
 		var max_obs = difficulty + 1
-		print("max obs = ",max_obs)
+		
 		var obs_round = range(randi() % max_obs + 1)
-		print("obs_round = ", obs_round)
+		
 		for i in obs_round:
 			
 			obs = obs_type.instantiate() # สร้าง instance (ส าเนา) ของ scene อุปสรรคที่เลือกมา
@@ -100,12 +100,15 @@ func generate_obs(): # ฟังก์ชันสร้างอุปสรร
 			#add_child(obs) # เพิ่มอุปสรรคเข้าไปใน scene tree เพื่อแสดงในเกมobstacles.append(obs) # เก็บ reference ของอุปสรรคไว้ในลิสต์ obstacles
 			#obstacles.append(obs)
 			if difficulty == MAX_DIFFICULTY:
+
 				if (randi() % 2) == 0:
+					
 					#generate bird obstacles
 					obs = bird_scene.instantiate()
 					obs_x  = screen_size.x + score + 100
 					obs_y  = bird_heighs[randi() % bird_heighs.size()]
 					add_obs(obs, obs_x, obs_y)
+				
 			
 		
 		
@@ -117,10 +120,14 @@ func add_obs(obs, x, y):
 
 func hit_obs(body):
 	if body.name == "Dino":
-		pass
+		game_over()
 		#print("hit")
 
 func adjust_difficulty():
 	difficulty = score / SPEED_MODIFIER
 	if difficulty > MAX_DIFFICULTY:
 		difficulty = MAX_DIFFICULTY
+
+func game_over():
+	get_tree().paused = true
+	running_start=false
