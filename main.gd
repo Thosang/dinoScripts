@@ -46,10 +46,10 @@ func _process(delta: float) -> void:
 	
 	if running_start:
 		generate_obs()
-		speed = START_SPEED +(score/SPEED_MODIFIER)
+		speed = START_SPEED +(score/SPEED_MODIFIER) 
 		if speed>=MAX_SPEED :
 			speed = MAX_SPEED
-		print(speed)
+		
 		score +=speed 
 		show_score()  
 		
@@ -85,12 +85,21 @@ func generate_obs(): # ฟังก์ชันสร้างอุปสรร
 		# +100 ไว้เป็นระยะ buffer กันไม่ให้มันโผล่มาชิดเกินไป
 		var obs_x : int = screen_size.x + score + 100
 		var obs_y : int = screen_size.y - ground_height - (obs_height * obs_scale.y / 2) + 5
-		obs.position = Vector2i(obs_x, obs_y) # ตั้งต าแหน่ง (x, y) ให้กับอุปสรรค
+		
+		add_obs(obs,obs_x,obs_y)
+		#obs.position = Vector2i(obs_x, obs_y) # ตั้งต าแหน่ง (x, y) ให้กับอุปสรรค
+		#add_child(obs) # เพิ่มอุปสรรคเข้าไปใน scene tree เพื่อแสดงในเกมobstacles.append(obs) # เก็บ reference ของอุปสรรคไว้ในลิสต์ obstacles
+		#obstacles.append(obs)
+		
 		last_obs = obs
-		add_child(obs) # เพิ่มอุปสรรคเข้าไปใน scene tree เพื่อแสดงในเกมobstacles.append(obs) # เก็บ reference ของอุปสรรคไว้ในลิสต์ obstacles
-		obstacles.append(obs)
+		
+		
 func add_obs(obs, x, y):
 	obs.position = Vector2i(x, y)
-	#obs.body_entered.connect(hit_obs)
+	obs.body_entered.connect(hit_obs)
 	add_child(obs)
 	obstacles.append(obs)
+
+func hit_obs(body):
+	if body.name == "Dino":
+		print("hit")
